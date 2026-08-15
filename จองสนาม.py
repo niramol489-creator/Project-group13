@@ -185,3 +185,256 @@ class SportBooking:
 # เริ่มโปรแกรม
 app = SportBooking()
 app.menu()
+# ============================================
+# ระบบเช่าอุปกรณ์กีฬา - ฟุตบอลและแบดมินตัน
+# (คิดราคาต่อชั่วโมง, ลูกแบด+ถุงเท้าซื้อขาด)
+# (พร้อมระบบสต็อก)
+# ============================================
+
+print("=" * 60)
+print("⚽ ระบบเช่าอุปกรณ์กีฬา ⚽")
+print("   (ฟุตบอลและแบดมินตัน)")
+print("=" * 60)
+print()
+
+# รายการอุปกรณ์และราคา
+# ประเภท: "rental" = เช่าต่อชม., "buy" = ซื้อขาด
+equipment_list = {
+    1: {"name": "ลูกฟุตบอล", "price": 20, "category": "ฟุตบอล", "type": "rental", "stock": 30},
+    2: {"name": "เสื้อทีมฟุตบอล", "price": 15, "category": "ฟุตบอล", "type": "rental", "stock": 30},
+    3: {"name": "รองเท้าฟุตบอล", "price": 50, "category": "ฟุตบอล", "type": "rental", "stock": 15},
+    4: {"name": "ไม้แบดมินตัน", "price": 70, "category": "แบดมินตัน", "type": "rental", "stock": 25},
+    5: {"name": "ลูกแบดมินตัน", "price": 35, "category": "แบดมินตัน", "type": "buy", "stock": 20},
+    6: {"name": "รองเท้าแบดมินตัน", "price": 50, "category": "แบดมินตัน", "type": "rental", "stock": 20},
+    7: {"name": "ถุงเท้า", "price": 20, "category": "อุปกรณ์เสริม", "type": "buy", "stock": 50},
+}
+
+# แสดงรายการอุปกรณ์
+print("📋 รายการอุปกรณ์กีฬา:")
+print("-" * 60)
+print("\n🔵 ฟุตบอล:")
+for eq_id, eq_info in equipment_list.items():
+    if eq_info["category"] == "ฟุตบอล":
+        if eq_info["type"] == "rental":
+            print(f"     {eq_id}. {eq_info['name']:<25} ราคา {eq_info['price']:>3} บาท/ชม. (เช่า) | คงเหลือ: {eq_info['stock']:>2} ชิ้น")
+        else:
+            print(f"     {eq_id}. {eq_info['name']:<25} ราคา {eq_info['price']:>3} บาท/คู่ (ซื้อ) | คงเหลือ: {eq_info['stock']:>2} คู่")
+
+print("\n🟢 แบดมินตัน:")
+for eq_id, eq_info in equipment_list.items():
+    if eq_info["category"] == "แบดมินตัน":
+        if eq_info["type"] == "rental":
+            print(f"     {eq_id}. {eq_info['name']:<25} ราคา {eq_info['price']:>3} บาท/ชม. (เช่า) | คงเหลือ: {eq_info['stock']:>2} ชิ้น")
+        else:
+            print(f"     {eq_id}. {eq_info['name']:<25} ราคา {eq_info['price']:>3} บาท/ลูก (ซื้อ) | คงเหลือ: {eq_info['stock']:>2} ลูก")
+
+print("\n🟡 อุปกรณ์เสริม:")
+for eq_id, eq_info in equipment_list.items():
+    if eq_info["category"] == "อุปกรณ์เสริม":
+        if eq_info["type"] == "rental":
+            print(f"     {eq_id}. {eq_info['name']:<25} ราคา {eq_info['price']:>3} บาท/ชม. (เช่า) | คงเหลือ: {eq_info['stock']:>2} ชิ้น")
+        else:
+            print(f"     {eq_id}. {eq_info['name']:<25} ราคา {eq_info['price']:>3} บาท/คู่ (ซื้อ) | คงเหลือ: {eq_info['stock']:>2} คู่")
+
+print("-" * 60)
+print()
+
+# ให้ผู้ใช้เลือกอุปกรณ์
+while True:
+    try:
+        selected_id = int(input("👉 เลือกอุปกรณ์ (ใส่หมายเลข 1-7): "))
+        if selected_id in equipment_list:
+            break
+        else:
+            print("❌ กรุณาเลือกหมายเลข 1-7 เท่านั้น\n")
+    except ValueError:
+        print("❌ กรุณาใส่ตัวเลขเท่านั้น\n")
+
+selected_equipment = equipment_list[selected_id]
+print(f"\n✓ เลือก: {selected_equipment['name']} ({selected_equipment['category']})")
+
+# แสดงประเภท (เช่า หรือ ซื้อ) และสต็อก
+if selected_equipment["type"] == "rental":
+    print(f"  📌 ประเภท: เช่า (คิดราคาต่อชั่วโมง)")
+    print(f"  📦 สต็อกคงเหลือ: {selected_equipment['stock']} ชิ้น")
+else:
+    print(f"  📌 ประเภท: ซื้อขาด (คิดราคาต่อคู่)")
+    print(f"  📦 สต็อกคงเหลือ: {selected_equipment['stock']} คู่")
+print()
+
+# คำนวณราคา
+price_per_unit = selected_equipment["price"]
+
+# ถ้าเป็นประเภทเช่า ต้องถามจำนวนชั่วโมง
+if selected_equipment["type"] == "rental":
+    while True:
+        try:
+            rental_hours = int(input("👉 จำนวนชั่วโมงเช่า: "))
+            if rental_hours > 0:
+                break
+            else:
+                print("❌ จำนวนชั่วโมงต้องมากกว่า 0\n")
+        except ValueError:
+            print("❌ กรุณาใส่ตัวเลขเท่านั้น\n")
+    
+    while True:
+        try:
+            quantity = int(input("👉 จำนวนชิ้น: "))
+            if quantity > 0:
+                # ตรวจสอบสต็อก
+                if quantity > selected_equipment["stock"]:
+                    print(f"❌ สินค้าไม่พอ! คงเหลือเพียง {selected_equipment['stock']} ชิ้น\n")
+                else:
+                    break
+            else:
+                print("❌ จำนวนชิ้นต้องมากกว่า 0\n")
+        except ValueError:
+            print("❌ กรุณาใส่ตัวเลขเท่านั้น\n")
+    
+    subtotal = price_per_unit * rental_hours * quantity
+    discount = 0
+    
+    # ส่วนลด: เช่า 5 ชั่วโมงขึ้นไป ลด 10%
+    if rental_hours >= 5:
+        discount = subtotal * 0.10
+        print("\n🎉 คุณได้รับส่วนลด 10% (เช่า 5 ชั่วโมงขึ้นไป)")
+    
+    # แสดงผลสรุป
+    print()
+    print("=" * 60)
+    print("📊 สรุปการเช่า")
+    print("=" * 60)
+    print(f"  อุปกรณ์:        {selected_equipment['name']}")
+    print(f"  ประเภท:         {selected_equipment['category']}")
+    print(f"  ราคาต่อชม.:     {price_per_unit} บาท")
+    print(f"  จำนวนชั่วโมง:   {rental_hours} ชม.")
+    print(f"  จำนวนชิ้น:      {quantity} ชิ้น")
+    print("-" * 60)
+    print(f"  ราคารวม:        {subtotal:,.2f} บาท")
+    if discount > 0:
+        print(f"  ส่วนลด:         -{discount:,.2f} บาท")
+    
+    total_price = subtotal - discount
+    print(f"  💰 ยอดสุทธิ:    {total_price:,.2f} บาท")
+    print("=" * 60)
+    
+    # ตัดสต็อก
+    selected_equipment["stock"] -= quantity
+    print(f"\n  📦 สต็อกคงเหลือหลังเช่า: {selected_equipment['stock']} ชิ้น")
+
+# ถ้าเป็นประเภทซื้อ (ลูกแบด, ถุงเท้า)
+else:
+    while True:
+        try:
+            quantity = int(input("👉 จำนวนคู่ที่ต้องการซื้อ: "))
+            if quantity > 0:
+                # ตรวจสอบสต็อก
+                if quantity > selected_equipment["stock"]:
+                    print(f"❌ สินค้าไม่พอ! คงเหลือเพียง {selected_equipment['stock']} คู่\n")
+                else:
+                    break
+            else:
+                print("❌ จำนวนต้องมากกว่า 0\n")
+        except ValueError:
+            print("❌ กรุณาใส่ตัวเลขเท่านั้น\n")
+    
+    subtotal = price_per_unit * quantity
+    
+    # ส่วนลด: ซื้อ 10 คู่ขึ้นไป ลด 5%
+    discount = 0
+    if quantity >= 10:
+        discount = subtotal * 0.05
+        print("\n🎉 คุณได้รับส่วนลด 5% (ซื้อ 10 คู่ขึ้นไป)")
+    
+    # แสดงผลสรุป
+    print()
+    print("=" * 60)
+    print("📊 สรุปการซื้อ")
+    print("=" * 60)
+    print(f"  อุปกรณ์:        {selected_equipment['name']}")
+    print(f"  ประเภท:         {selected_equipment['category']}")
+    print(f"  ราคาต่อคู่:     {price_per_unit} บาท")
+    print(f"  จำนวนคู่:       {quantity} คู่")
+    print("-" * 60)
+    print(f"  ราคารวม:        {subtotal:,.2f} บาท")
+    if discount > 0:
+        print(f"  ส่วนลด:         -{discount:,.2f} บาท")
+    
+    total_price = subtotal - discount
+    print(f"  💰 ยอดสุทธิ:    {total_price:,.2f} บาท")
+    print("=" * 60)
+    
+    # ตัดสต็อก
+    selected_equipment["stock"] -= quantity
+    print(f"\n  📦 สต็อกคงเหลือหลังซื้อ: {selected_equipment['stock']} คู่")
+
+print()
+
+# เลือกวิธีชำระเงิน
+print("💳 วิธีชำระเงิน:")
+print("  1. โอนเงินธนาคาร")
+print("  2. จ่ายเงินสด")
+print()
+
+while True:
+    payment_method = input("👉 เลือกวิธีชำระเงิน (1 หรือ 2): ").strip()
+    if payment_method in ["1", "2"]:
+        break
+    else:
+        print("❌ กรุณาเลือก 1 หรือ 2\n")
+
+print()
+print("=" * 60)
+print("✅ สรุปการชำระเงิน")
+print("=" * 60)
+
+if payment_method == "1":
+    print("  วิธีชำระ:      โอนเงินธนาคาร")
+    print()
+    print("  📌 ข้อมูลการโอน:")
+    print("     ธนาคาร:     กสิกรไทย")
+    print("     ชื่อบัญชี:   ร้านเช่าอุปกรณ์กีฬา")
+    print("     เลขบัญชี:   123-4-56789-0")
+    print()
+    print(f"  💵 ยอดที่ต้องโอน:  {total_price:,.2f} บาท")
+    print()
+    if selected_equipment["type"] == "rental":
+        print("  ⚠️  กรุณาโอนและแจ้งสลิปเพื่อยืนยันการเช่า")
+    else:
+        print("  ⚠️  กรุณาโอนและแจ้งสลิปเพื่อยืนยันการซื้อ")
+else:
+    print("  วิธีชำระ:      จ่ายเงินสด")
+    print()
+    print(f"  💰 ยอดที่ต้องจ่าย:  {total_price:,.2f} บาท")
+    print()
+    
+    # รับเงินจากลูกค้า
+    while True:
+        try:
+            received_amount = float(input("  👉 รับเงินจากลูกค้า: "))
+            if received_amount >= total_price:
+                break
+            else:
+                print(f"  ❌ เงินไม่พอ! ต้องรับอย่างน้อย {total_price:,.2f} บาท\n")
+        except ValueError:
+            print("  ❌ กรุณาใส่ตัวเลขเท่านั้น\n")
+    
+    # คำนวณเงินทอน
+    change = received_amount - total_price
+    
+    print()
+    print("  📌 สรุปการรับ-ทอนเงิน:")
+    print(f"     ยอดสุทธิ:      {total_price:,.2f} บาท")
+    print(f"     รับเงินมา:     {received_amount:,.2f} บาท")
+    print(f"     💵 เงินทอน:    {change:,.2f} บาท")
+    print()
+    
+    if selected_equipment["type"] == "rental":
+        print("  ⚠️  กรุณารับอุปกรณ์และเก็บรักษาให้ดี")
+    else:
+        print("  ⚠️  กรุณารับสินค้าและตรวจสอบความเรียบร้อย")
+
+print()
+print("=" * 60)
+print("🙏 ขอบคุณที่ใช้บริการ!")
+print("=" * 60)
